@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - /var/lib/postgresql/data/
+      - ./init_db.sh :/docker-entrypoint-initdb.d/init_db.sh
+    expose:
+      - "5432"
+    env_file:
+    - .env
+
+
+  redis:
+    restart: always
+    image: "redis:alpine"
+    expose:
+      - "6379"
+
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "python /code/manage.py migrate --noinput && python /code/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  celery:
+    build: .
+    command: celery -A config worker -l DEBUG --loglevel=debug
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+
+  celery-beat:
+    build: .
+    command: celery -A config beat -l DEBUG --loglevel=debug --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/code
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
