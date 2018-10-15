@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "python /code/manage.py migrate --noinput && python /code/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python /code/manage.py migrate --noinput && python /code/manage.py loaddata fixtures && python /code/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
@@ -42,8 +42,12 @@ services:
     depends_on:
       - postgres
       - redis
+      - web
     env_file:
       - .env
+    links:
+      - postgres
+      - web
 
   celery-beat:
     build: .
@@ -53,8 +57,12 @@ services:
     depends_on:
       - postgres
       - redis
+      - web
     env_file:
       - .env
+    links:
+      - postgres
+      - web
 
 volumes:
   postgres_data:

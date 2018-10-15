@@ -6,7 +6,7 @@ PARAMS = dict(
     DEBUG=True,
 
     POSTGRES_ENGINE='django.db.backends.postgresql_psycopg2',
-    POSTGRES_DB='new_database1',
+    POSTGRES_DB='new_database111',
     POSTGRES_HOST='127.0.0.1',
     POSTGRES_USER='postgres',
     POSTGRES_PORT=5432,
