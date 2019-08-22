@@ -1,4 +1,4 @@
-# currency_convertor
+# Currency convertor
 
  Simple currency converter
  
